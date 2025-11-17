@@ -1,37 +1,56 @@
 "use client";
 
-import { useOverviewMenu, useSettingsMenu } from "@/menu";
+import { useBlogCreationMenu, useOverviewMenu, useSettingsMenu } from "@/menu";
 import NavBarOverview from "../components/NavBarOverviewTemp";
 import OverviewMenuDrawer from "../components/OverviewMenuDrawer";
 import { AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { UserType } from "@/types/UserType";
 import SettingsMenu from "../components/SettingsMenu";
-import { useRouter } from "next/navigation";
+import BlogCreationMenu from "../components/BlogCreationMenu";
 
 export default function OverviewPage() {
   const menu = useOverviewMenu();
   const settingsMenu = useSettingsMenu();
   const [user, setUser] = useState<UserType | null>(null);
-  const router = useRouter(); 
-  
+  const [error, setError] = useState("");
+
+  const creationMenu = useBlogCreationMenu();
+
   useEffect(() => {
     const token = localStorage.getItem("token");
-    
+
     fetch("https://sticky-charil-react-blog-3b39d9e9.koyeb.app/auth/me", {
       headers: { Authorization: `Bearer ${token}` },
       credentials: "include"
     })
-
-    .then(res => {
-      if (!res.ok) router.push("/");
-      return res.json();
-    })
-    .then(data => setUser(data));
+      .then(res => {
+        if (!res.ok) {
+          setError("Unauthorized");
+        }
+        return res.json();
+      })
+      .then(data => setUser(data))
+      .catch(err => {
+        // Impede que o erro apareça como "Uncaught"
+        console.warn("Erro ao buscar usuário:", err.message);
+      });
   }, []);
 
   return (
     <div>
+      {creationMenu.isOpen && (
+        <>
+          {/* Fundo escuro */}
+          <div className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"></div>
+
+          {/* Menu de configurações sobreposto */}
+          <div className="flex justify-center items-center fixed inset-0 z-50">
+            <BlogCreationMenu onClose={creationMenu.closeMenu} />
+          </div>
+        </>
+      )}
+
       {settingsMenu.isOpen && (
         <>
           {/* Fundo escuro */}
@@ -39,7 +58,7 @@ export default function OverviewPage() {
 
           {/* Menu de configurações sobreposto */}
           <div className="fixed inset-0 z-50">
-            <SettingsMenu onClose={settingsMenu.closeMenu}/>
+            <SettingsMenu onClose={settingsMenu.closeMenu} />
           </div>
         </>
       )}

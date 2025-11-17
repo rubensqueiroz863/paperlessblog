@@ -95,7 +95,7 @@ export default function UserMenu({ user, onClose }: Readonly<{ user: UserProps, 
             </button>
           </div>
           <div className="h-0.5 w-full bg-neutral-700"></div>
-          <div className="flex gap-12 h-full p-3 w-full bg-[#1f1f1f] rounded-b-md">
+          <div className="flex gap-8 h-full p-3 w-full bg-[#1f1f1f] rounded-b-md">
             <p className="text-sm text-neutral-400">{user.email}</p>
             
             <div

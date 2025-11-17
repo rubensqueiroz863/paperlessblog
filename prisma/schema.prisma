@@ -16,4 +16,17 @@ model users {
   image      String?
   provider   String?
   created_at DateTime @default(now())
+  blogs      Blogs[]
+}
+
+model Blogs {
+  id           String    @id @default(cuid())
+  content      String?   @db.Text
+  image        String?
+  description  String?
+  title        String
+  type         String
+  created_at   DateTime  @default(now())
+  user         users     @relation(fields: [userId], references: [id])
+  userId       String
 }
