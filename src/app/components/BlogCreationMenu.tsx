@@ -13,10 +13,16 @@ export default function SettingsMenu({ onClose }: { onClose: () => void }) {
 
     const form = e.currentTarget;
 
-    const data = {
-      name: form.blogName.value,
-      type: form.blogType.value, // tipo do blog
-    };
+    const formData = new FormData();
+    formData.append("name", form.blogName.value);
+    formData.append("type", form.blogType.value);
+    formData.append("description", form.blogDescription.value);
+
+    // pega arquivo se existir
+    const file = form.blogImage.files[0];
+    if (file) {
+      formData.append("file", file);
+    }
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -27,10 +33,10 @@ export default function SettingsMenu({ onClose }: { onClose: () => void }) {
     const res = await fetch("/api/createBlog", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+        // ❌ NÃO ENVIE Content-Type aqui, o browser define automaticamente
       },
-      body: JSON.stringify(data),
+      body: formData,
     });
 
     if (!res.ok) {
@@ -39,9 +45,11 @@ export default function SettingsMenu({ onClose }: { onClose: () => void }) {
       setIsLoading(false);
       return;
     }
+
     setSuccess(true);
     setIsLoading(false);
   }
+
 
   if (isLoading) {
     return (
@@ -63,7 +71,11 @@ export default function SettingsMenu({ onClose }: { onClose: () => void }) {
           </p>
 
           <button
-            onClick={onClose}
+            onClick={() => {
+              onClose();
+              window.location.reload();
+            }}
+
             className="mt-2 px-6 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-500 transition cursor-pointer"
           >
             Fechar
@@ -101,6 +113,49 @@ export default function SettingsMenu({ onClose }: { onClose: () => void }) {
                 required
               />
             </div>
+
+            <div className="space-y-1">
+              <label className="text-neutral-300 text-sm font-medium">
+                Descrição
+              </label>
+
+              <textarea
+                name="blogDescription"
+                className="
+                  w-full
+                  px-3
+                  py-2
+                  h-20
+                  bg-neutral-900
+                  border border-neutral-600
+                  rounded-md
+                  text-white
+                  placeholder-neutral-400
+                  focus:outline-none
+                  focus:border-neutral-300
+                  resize-none
+                  custom-scroll
+                "
+                placeholder="Digite a descrição do seu blog..."
+                required
+              />
+            </div>
+
+
+            <div className="space-y-1">
+              <label className="text-neutral-300 text-sm font-medium">
+                Imagem do blog
+              </label>
+
+              <input
+                type="file"
+                name="blogImage"
+                accept="image/*"
+                required
+                className="w-full px-3 py-2 bg-neutral-900 border border-neutral-600 rounded-md text-white"
+              />
+            </div>
+
 
             {/* Tipo */}
             <div className="flex flex-col space-y-2 text-white">

@@ -1,10 +1,23 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { jwtVerify } from "jose";
+import cloudinary from "@/lib/cloudinary";
+
+interface CloudinaryUploadResult {
+  secure_url: string;
+  url: string;
+  public_id: string;
+  format: string;
+  bytes: number;
+  width: number;
+  height: number;
+  resource_type: string;
+}
+
 
 export async function POST(req: Request) {
   try {
-    // 1️⃣ Pega o token do header
+    // 1️⃣ Token
     const auth = req.headers.get("authorization");
     if (!auth || !auth.startsWith("Bearer ")) {
       return NextResponse.json(
@@ -14,15 +27,14 @@ export async function POST(req: Request) {
     }
 
     const token = auth.split(" ")[1];
-    if (!process.env.JWT_SECRET) {
-      throw new Error("JWT_SECRET não definido no ambiente");
-    }
+    const secret = process.env.JWT_SECRET;
 
-    // 2️⃣ Verifica e decodifica o token
+    if (!secret) throw new Error("JWT_SECRET não definido");
+
     let payload;
     try {
-      ({ payload } = await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET)));
-    } catch (err) {
+      ({ payload } = await jwtVerify(token, new TextEncoder().encode(secret)));
+    } catch {
       return NextResponse.json(
         { success: false, message: "Token inválido ou expirado" },
         { status: 401 }
@@ -30,39 +42,57 @@ export async function POST(req: Request) {
     }
 
     const userId = payload.id as string;
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, message: "ID do usuário não encontrado no token" },
-        { status: 401 }
-      );
-    }
 
-    // 3️⃣ Pega o body da requisição
-    const body = await req.json();
-    const { name, type } = body;
+    // 2️⃣ FormData
+    const form = await req.formData();
 
-    if (!name || !type) {
+    const name = form.get("name") as string;
+    const type = form.get("type") as string;
+    const description = form.get("description") as string;
+    const file = form.get("file") as File | null;
+
+    if (!name || !type || !description) {
       return NextResponse.json(
-        { success: false, message: "Nome e tipo do blog são obrigatórios" },
+        { success: false, message: "Nome, tipo e descrição são obrigatórios" },
         { status: 400 }
       );
     }
 
-    // 4️⃣ Cria o blog no Prisma
+    // 3️⃣ Upload Cloudinary
+    let imageUrl: string | null = null;
+
+    if (file) {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const uploaded: CloudinaryUploadResult = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { folder: "blogs" },
+          (err, result) => {
+            if (err) reject(err);
+            else resolve(result as CloudinaryUploadResult);
+          }
+        ).end(buffer);
+      });
+
+      imageUrl = uploaded.secure_url;
+    }
+
+    // 4️⃣ Criar Blog
     const blog = await prisma.blogs.create({
       data: {
         title: name,
-        type: type,
-        content: "", // Pode mudar se quiser permitir conteúdo inicial
-        userId: userId,
+        description,
+        type,
+        image: imageUrl,
+        content: "",
+        userId,
       },
     });
 
-    // 5️⃣ Retorna sucesso
     return NextResponse.json({ success: true, blog });
-   } catch (err) {
-    // captura qualquer tipo de erro
-    console.error("Erro ao criar blog:", err); // log completo no servidor
+  } catch (err) {
+    console.error("Erro ao criar blog:", err);
     return NextResponse.json({ success: false }, { status: 500 });
   }
 }

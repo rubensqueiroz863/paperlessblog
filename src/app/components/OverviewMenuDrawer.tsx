@@ -146,7 +146,7 @@ export default function OverviewMenuDrawer({ user }: Readonly<{ user: UserProps}
           </button>
 
           {/* LISTAGEM DOS BLOGS AQUI */}
-          <div className="mt-2 max-h-64 overflow-y-auto pr-1">
+          <div className="mt-2 h-80 max-h-90 custom-scroll overflow-y-auto pr-1">
             {blogs.length > 0 ? (
               blogs.map((blog: BlogType) => (
                 <BlogCard key={blog.id} blog={blog} />
