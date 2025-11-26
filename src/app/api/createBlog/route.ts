@@ -85,7 +85,7 @@ export async function POST(req: Request) {
         description,
         type,
         image: imageUrl,
-        content: "",
+        content: "kknmjb",
         userId,
       },
     });

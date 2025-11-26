@@ -6,6 +6,15 @@ import LoadingSpinner from "./LoadingSpinner";
 export default function SettingsMenu({ onClose }: { onClose: () => void }) {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+  }
 
   async function handleSubimit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -152,8 +161,20 @@ export default function SettingsMenu({ onClose }: { onClose: () => void }) {
                 name="blogImage"
                 accept="image/*"
                 required
-                className="w-full px-3 py-2 bg-neutral-900 border border-neutral-600 rounded-md text-white"
+                onChange={handleImageChange}
+                className="w-full cursor-pointer px-3 py-2 bg-neutral-900 border border-neutral-600 rounded-md text-white"
               />
+              <div className="flex w-full my-2">
+                {preview && (
+                  <div className="flex justify-center">
+                    <img
+                      src={preview}
+                      alt="Preview"
+                      className="w-32 h-32 object-cover rounded-md border border-neutral-700"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
 
@@ -161,7 +182,7 @@ export default function SettingsMenu({ onClose }: { onClose: () => void }) {
             <div className="flex flex-col space-y-2 text-white">
               <p className="text-sm font-medium">Tipo do blog</p>
 
-              <label className="flex items-center space-x-2">
+              <label className="flex items-center cursor-pointer space-x-2">
                 <input
                   type="radio"
                   name="blogType"
@@ -172,7 +193,7 @@ export default function SettingsMenu({ onClose }: { onClose: () => void }) {
                 <span>Público</span>
               </label>
 
-              <label className="flex items-center space-x-2">
+              <label className="flex items-center cursor-pointer space-x-2">
                 <input
                   type="radio"
                   name="blogType"

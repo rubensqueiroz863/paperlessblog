@@ -10,10 +10,12 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import BlogCard from "./BlogCard";
 import { BlogType } from "@/types/BlogType";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function OverviewMenuDrawer({ user }: Readonly<{ user: UserProps}>) {
   const [width, setWidth] = useState(250);
   const [blogs, setBlogs] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const isResizing = useRef(false);
   const overviewMenu = useOverviewMenu();
   const clientMenu = useClientMenu();
@@ -49,6 +51,7 @@ export default function OverviewMenuDrawer({ user }: Readonly<{ user: UserProps}
   };
 
   useEffect(() => {
+    setIsLoading(true);
     const token = localStorage.getItem("token");
     if (!token) return;
 
@@ -57,7 +60,7 @@ export default function OverviewMenuDrawer({ user }: Readonly<{ user: UserProps}
     })
       .then(res => {
         if (!res.ok) return;
-
+        setIsLoading(false);
         return res.json();
       })
       .then(data => {
@@ -68,8 +71,8 @@ export default function OverviewMenuDrawer({ user }: Readonly<{ user: UserProps}
       .catch(err => {
         console.warn("Erro ao buscar blogs:", err.message);
       });
-
-  }, []); // <-- apenas isso, sem parênteses extras
+      setIsLoading(false);
+  }, []); 
 
 
   return (
@@ -98,7 +101,6 @@ export default function OverviewMenuDrawer({ user }: Readonly<{ user: UserProps}
           >
             <UserIcon user={user} width={"6"} height={"6"}/>
             <p className="dark:text-white">{user?.name}</p>
-            
           </button>
 
           <button
@@ -146,15 +148,22 @@ export default function OverviewMenuDrawer({ user }: Readonly<{ user: UserProps}
           </button>
 
           {/* LISTAGEM DOS BLOGS AQUI */}
-          <div className="mt-2 h-80 max-h-90 custom-scroll overflow-y-auto pr-1">
-            {blogs.length > 0 ? (
-              blogs.map((blog: BlogType) => (
-                <BlogCard key={blog.id} blog={blog} />
-              ))
+          {
+            isLoading ? (
+              <LoadingSpinner width="w-10 h-10"/>
             ) : (
-              <p className="text-neutral-500 text-xs ml-4">Nenhum blog criado ainda.</p>
-            )}
-          </div>
+              <div className="mt-2 h-80 max-h-90 custom-scroll overflow-y-auto pr-1">
+                {blogs.length > 0 ? (
+                  blogs.map((blog: BlogType) => (
+                    <BlogCard key={blog.id} blog={blog} />
+                  ))
+                ) : (
+                  <p className="text-neutral-500 text-xs ml-4">Nenhum blog criado ainda.</p>
+                )}
+              </div>
+            )
+          }
+          
 
           { clientMenu.isOpen ? (
               <UserMenu user={user} onClose={clientMenu.closeMenu}/>
