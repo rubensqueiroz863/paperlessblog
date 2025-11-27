@@ -95,8 +95,8 @@ export default function SettingsMenu({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-[90%] max-w-md rounded-xl bg-neutral-800 border border-neutral-700 shadow-2xl">
+    <div className="flex w-full h-full">
+      <div className="w-full rounded-xl border border-neutral-700 shadow-2xl">
 
         {/* Header */}
         <div className="flex items-center justify-center bg-neutral-700 px-4 h-12 rounded-t-xl">

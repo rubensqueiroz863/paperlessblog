@@ -39,17 +39,7 @@ export default function OverviewPage() {
 
   return (
     <div>
-      {creationMenu.isOpen && (
-        <>
-          {/* Fundo escuro */}
-          <div className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"></div>
-
-          {/* Menu de configurações sobreposto */}
-          <div className="flex justify-center items-center fixed inset-0 z-50">
-            <BlogCreationMenu onClose={creationMenu.closeMenu} />
-          </div>
-        </>
-      )}
+      
 
       {settingsMenu.isOpen && (
         <>
@@ -76,7 +66,15 @@ export default function OverviewPage() {
           )}
 
           <div className="flex-1 w-full h-full dark:text-white bg-white dark:bg-neutral-900 p-4 overflow-auto">
-            ok
+            {creationMenu.isOpen && (
+              <>
+
+                {/* Menu de configurações sobreposto */}
+                <div className="flex">
+                  <BlogCreationMenu onClose={creationMenu.closeMenu} />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

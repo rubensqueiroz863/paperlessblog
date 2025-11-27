@@ -15,6 +15,7 @@ import LoadingSpinner from "./LoadingSpinner";
 export default function OverviewMenuDrawer({ user }: Readonly<{ user: UserProps}>) {
   const [width, setWidth] = useState(250);
   const [blogs, setBlogs] = useState([]);
+  const [isHome, setIsHome] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const isResizing = useRef(false);
   const overviewMenu = useOverviewMenu();
@@ -51,6 +52,9 @@ export default function OverviewMenuDrawer({ user }: Readonly<{ user: UserProps}
   };
 
   useEffect(() => {
+    if ("http://localhost:3000/" + "overview" === window.location.href) {
+      setIsHome(true);
+    }
     setIsLoading(true);
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -119,7 +123,7 @@ export default function OverviewMenuDrawer({ user }: Readonly<{ user: UserProps}
 
           <button
             onClick={() => router.push("/overview")}
-            className="flex mx-1 my-0.5 rounded-md w-full h-8 items-center gap-1.5 font-semibold text-[15px] p-2 hover:bg-[#333333] transition-all cursor-pointer"
+            className={`flex ${isHome ? "bg-[#333333]" : ""} mx-1 my-0.5 rounded-md w-full h-8 items-center gap-1.5 font-semibold text-[15px] p-2 hover:bg-[#333333] transition-all cursor-pointer`}
           >
             <Image
               src={"https://i.postimg.cc/bwMRg6v1/8367621.png"}
@@ -134,8 +138,8 @@ export default function OverviewMenuDrawer({ user }: Readonly<{ user: UserProps}
           <p className="ml-3 text-sm mt-6 font-semibold text-neutral-400">Blogs</p>
 
           <button
-            onClick={creationMenu.openMenu}
-            className="flex mx-1 my-0.5 rounded-md w-full h-8 items-center gap-2 font-semibold text-[15px] p-2 hover:bg-[#333333] transition-all cursor-pointer"
+            onClick={creationMenu.toggleMenu}
+            className={`flex mx-1 ${creationMenu.isOpen ? "bg-[#333333]" : ""} my-0.5 rounded-md w-full h-8 items-center gap-2 font-semibold text-[15px] p-2 hover:bg-[#333333] transition-all cursor-pointer`}
           >
             <Image
               src={"https://i.postimg.cc/Vvw2dJZJ/plus-PNG100.png"}
