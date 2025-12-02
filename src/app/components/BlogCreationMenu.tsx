@@ -50,7 +50,7 @@ export default function SettingsMenu({ onClose }: { onClose: () => void }) {
 
     if (!res.ok) {
       const error = await res.json();
-      alert("Erro: " + error.message);
+      console.log("Erro: " + error.message);
       setIsLoading(false);
       return;
     }
@@ -95,7 +95,7 @@ export default function SettingsMenu({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="flex w-full h-full">
+    <div className="flex m-4 w-full h-full">
       <div className="w-full rounded-xl border border-neutral-700 shadow-2xl">
 
         {/* Header */}

@@ -24,7 +24,7 @@ export default function BlogCard({ blog }: { blog: BlogType }) {
       <div className="flex flex-1 justify-between items-center">
         {/* Título e descrição */}
         <div className="flex flex-col">
-          <p className="text-white font-semibold text-sm">{blog.title}</p>
+          <p className="text-white w-20 font-semibold text-sm truncate">{blog.title}</p>
           <p className="text-neutral-400 text-xs truncate w-24">
             {blog.description || "Sem descrição"}
           </p>

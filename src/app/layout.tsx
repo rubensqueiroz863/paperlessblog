@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${geistInter.variable} antialiased`}
+        className={`custom-scroll np${geistSans.variable} ${geistMono.variable} ${geistInter.variable} antialiased`}
       >
       {children}
       </body>

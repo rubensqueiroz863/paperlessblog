@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { jwtVerify } from "jose";
 import cloudinary from "@/lib/cloudinary";
@@ -15,7 +15,7 @@ interface CloudinaryUploadResult {
 }
 
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     // 1️⃣ Token
     const auth = req.headers.get("authorization");
@@ -93,6 +93,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, blog });
   } catch (err) {
     console.error("Erro ao criar blog:", err);
-    return NextResponse.json({ success: false }, { status: 500 });
+    return NextResponse.json({ message: err }, { status: 500 });
+
   }
 }
